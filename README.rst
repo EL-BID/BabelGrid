@@ -16,17 +16,67 @@ S2-py
 
 
 
-Python Boilerplate contains all the boilerplate you need to create a Python package.
+A light wrapper over [s2phere](https://github.com/sidewalklabs/s2sphere) to mirror
+[H3-py](https://github.com/uber/h3-py) API calls.
+
+Installing
+-----------
+
+`pip install s2`
+
+> It was not tested on Windowns
+
+Using
+-----
+
+Import It
+
+`from s2 import s2`
+
+Get a s2 square given a point
+
+```
+lat, lon, res = 12, -3, 10
+s2_address = s2.geo_to_s2(lat, lon, res)
+```
+
+Get the boundaries of a s2 square
+
+```
+s2.s2_to_geo_boundary(s2_address)
+```
+
+Get squares of a resolution within a polygon
+
+`s2.polyfill(geo_json, res)`
 
 
 * Free software: MIT license
-* Documentation: https://s2-py.readthedocs.io.
-
 
 Features
 --------
 
-* TODO
+Table of functions to be implemented in order of priority
+
+| h3 functions             | implemented? | issue |
+|--------------------------|--------------|-------|
+| geo_to_h3                | yes          |       |
+| h3_to_geo                | yes          |       |
+| h3_to_geo_boundary       | yes          |       |
+| polyfill                 | yes          |       |
+| hex_ring                 | no           |       |
+| k_ring                   | no           |       |
+| k_ring_distances         | no           |       |
+| h3_set_to_multi_polygon  | no           |       |
+| h3_to_parent             | no           |       |
+| h3_to_children           | no           |       |
+| hex_range                | no           |       |
+| hex_area                 | no           |       |
+| edge_length              | no           |       |
+| num_hexagons             | no           |       |
+| h3_indexes_are_neighbors | no           |       |
+| h3_distance              | no           |       |
+| h3_line_size             | no           |       |
 
 Credits
 -------
