@@ -3,11 +3,11 @@ S2-py
 =====
 
 
-.. image:: https://img.shields.io/pypi/v/s2_py.svg
-        :target: https://pypi.python.org/pypi/s2_py
+.. image:: https://img.shields.io/pypi/v/s2.svg
+        :target: https://pypi.python.org/pypi/s2
 
-.. image:: https://img.shields.io/travis/JoaoCarabetta/s2_py.svg
-        :target: https://travis-ci.org/JoaoCarabetta/s2_py
+.. image:: https://img.shields.io/travis/JoaoCarabetta/s2.svg
+        :target: https://travis-ci.org/JoaoCarabetta/s2
 
 .. image:: https://readthedocs.org/projects/s2-py/badge/?version=latest
         :target: https://s2-py.readthedocs.io/en/latest/?badge=latest

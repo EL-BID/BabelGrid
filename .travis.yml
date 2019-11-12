@@ -26,5 +26,5 @@ deploy:
     secure: PLEASE_REPLACE_ME
   on:
     tags: true
-    repo: JoaoCarabetta/s2_py
+    repo: JoaoCarabetta/s2
     python: 3.8

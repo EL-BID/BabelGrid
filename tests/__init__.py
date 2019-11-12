@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-"""Unit test package for s2_py."""
+"""Unit test package for s2."""

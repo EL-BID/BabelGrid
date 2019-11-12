@@ -12,7 +12,7 @@ To install S2-py, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install s2_py
+    $ pip install s2
 
 This is the preferred method to install S2-py, as it will always install the most recent stable release.
 
@@ -32,13 +32,13 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/JoaoCarabetta/s2_py
+    $ git clone git://github.com/JoaoCarabetta/s2
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl -OJL https://github.com/JoaoCarabetta/s2_py/tarball/master
+    $ curl -OJL https://github.com/JoaoCarabetta/s2/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/JoaoCarabetta/s2_py
-.. _tarball: https://github.com/JoaoCarabetta/s2_py/tarball/master
+.. _Github repo: https://github.com/JoaoCarabetta/s2
+.. _tarball: https://github.com/JoaoCarabetta/s2/tarball/master
