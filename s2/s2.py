@@ -89,7 +89,7 @@ def geo_to_s2(lat, lon, res):
     string
         s2 unique token
     """
-    return CellId.from_lat_lng(LatLng.from_degrees(lat, lon)).parent(res)
+    return CellId.from_lat_lng(LatLng.from_degrees(lat, lon)).parent(res).to_token()
 
 def s2_get_resolution(s2_address):
     """Gets resolution from s2 token. Resolution can vary
