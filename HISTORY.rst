@@ -5,7 +5,7 @@ History
 0.1.7 (2019-11-12)
 ------------------
 
-* Basic Documenations.
+* Basic Documenation.
 
 0.1.0 (2019-11-12)
 ------------------
