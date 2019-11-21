@@ -9,4 +9,4 @@ Sphinx==1.8.5
 twine==1.14.0
 s2sphere
 shapely
-
+pyaml

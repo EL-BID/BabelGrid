@@ -36,7 +36,10 @@ clean-build: ## remove build artifacts
 	rm -fr dist/
 	rm -fr .eggs/
 	find . -name '*.egg-info' -exec rm -fr {} +
-	find . -name '*.egg' -exec rm -fr {} +
+	find . -name '*.egg' -exec rm -fr
+	start-env:
+		python -m venv .env;
+		. .env/bin/activate; pip install -r requirements.txt; {} +
 
 clean-pyc: ## remove Python file artifacts
 	find . -name '*.pyc' -exec rm -f {} +
@@ -86,3 +89,7 @@ dist: clean ## builds source and wheel package
 
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
+
+start-env:
+	python -m venv .env
+	. .env/bin/activate; pip install -r requirements_dev.txt;
