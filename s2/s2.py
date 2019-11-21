@@ -149,7 +149,7 @@ def s2_to_geo_boundary(s2_address, geo_json_conformant=False):
             _to_latlon(LatLng.from_point(cell.get_vertex(i)))
             for i in [0, 1, 2, 3]]
 
-def polyfill(geo_json, res, geo_json_conformant=False):
+def polyfill(geo_json, res, geo_json_conformant=False, with_id=False):
     """Fill a polygon with s2 squares at given resolution
     
     Parameters
@@ -161,22 +161,34 @@ def polyfill(geo_json, res, geo_json_conformant=False):
     geo_json_conformant : bool, optional
         If True, output coordinates is geo_json conformant (lng, lat)
         If False, coordinates are (lat, lng), by default False
-    
+    with_id: bool, optional
+        If True, returns list of geometries
+        If False, returns list of dict with cell id and geometry
+
     Returns
     -------
-    list
-        List of geometries of s2 squares
+    list 
+        List of geometries of s2 squares or cell id with geometry if with_id is True
     """
     
     cells = _bbox_polyfill(geo_json, res)
-    cells_geo = map(lambda c: s2_to_geo_boundary(c.to_token(), geo_json_conformant), 
+    
+    cells_geo = map(lambda c: (c.to_token(), s2_to_geo_boundary(c.to_token(), geo_json_conformant)), 
                     cells)
-
+    
+    
     if geo_json_conformant:
         coordinates = geo_json['coordinates'][0]
     else:
         coordinates = list(map(_swipes, geo_json['coordinates'][0]))
         
-    return list(filter(
-                      lambda c: _geo_intersect(coordinates, c), 
-                      cells_geo))
+    filtered = filter(lambda c: _geo_intersect(coordinates, c[1]), 
+                      cells_geo)
+    
+    if with_id:
+        
+        return list(map(lambda x: {'id': x[0], 'geometry': x[1]}, filtered))
+
+    else:
+        
+        return list(map(lambda x: x[1], filtered))

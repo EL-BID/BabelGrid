@@ -7,6 +7,8 @@
 import unittest
 
 from s2 import s2
+import json
+import yaml
 
 
 class Tests2(unittest.TestCase):
@@ -44,3 +46,19 @@ class Tests2(unittest.TestCase):
 
         assert s2.s2_to_geo_boundary(s2_address) == geo_boundary
         assert s2.s2_to_geo_boundary(s2_address, True) == geo_boundary_geojson
+
+    def test_polyfill(self):
+
+        data_test = yaml.load(open('tests/test_data/polyfill_tests.yaml'))
+
+        for k in data_test.keys():
+            data_test[k] = json.loads(data_test[k])
+
+        assert s2.polyfill(data_test['boundary'], 10, False, True) == \
+                data_test['boundary_10_false_true']
+        
+        assert s2.polyfill(data_test['boundary'], 10, True, True) == \
+                data_test['boundary_10_true_true']
+
+        assert s2.polyfill(data_test['boundary'], 10, True, False) == \
+                data_test['boundary_10_true_false']
