@@ -90,6 +90,14 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
 
-start-env:
-	python -m venv .env
-	. .env/bin/activate; pip install -r requirements_dev.txt;
+REPO=$(shell basename $(CURDIR))
+
+create-env:
+	python3 -m venv .$(REPO);
+	source .$(REPO)/bin/activate; \
+			pip3 install --upgrade -r requirements_dev.txt; \
+			python3 -m ipykernel install --user --name=$(REPO);
+
+update-env:
+	source .$(REPO)/bin/activate; \
+	pip3 install --upgrade -r requirements.txt;

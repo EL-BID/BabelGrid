@@ -10,3 +10,9 @@ twine==1.14.0
 s2sphere
 shapely
 pyaml
+h3
+pygeotile
+pytest
+jupyterlab
+ipykernel
+black

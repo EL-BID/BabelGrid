@@ -96,4 +96,9 @@ target/
 output/
 python_boilerplate/
 
-.env/
+.BabelGrid
+.vscode
+.editorconfig
+.github
+.ipynb_checkpoints
+notebooks
