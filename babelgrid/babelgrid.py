@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from __future__ import annotations
 
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Any
 
 from h3 import h3
 import shapely
@@ -13,7 +13,9 @@ VALID_GRIDS = ["s2", "h3", "quadtree", "bing"]
 
 
 class Polygon:
-    def __init__(self, polygon: Union[str, dict, shapely.geometry.polygon.Polygon]) -> None:
+    def __init__(
+        self, polygon: Union[str, dict, shapely.geometry.polygon.Polygon, List[Any], Tuple[Any]]
+    ) -> None:
 
         if isinstance(polygon, shapely.geometry.polygon.Polygon):
 
@@ -60,7 +62,9 @@ class Polygon:
         return geometry.Polygon(polygon["coordinates"][0])
 
     @staticmethod
-    def from_list_to_shapely(polygon: List) -> shapely.geometry.polygon.Polygon:
+    def from_list_to_shapely(
+        polygon: Union[List[Any], Tuple[Any, ...]]
+    ) -> shapely.geometry.polygon.Polygon:
 
         return geometry.Polygon(polygon)
 
@@ -309,7 +313,7 @@ class Tile(Babel):
         self.tile_id: str = tile_id
         self.grid_type: str = grid_type
         self.parent_id: str = self.id_to_parent(tile_id)
-        self.children_id: str = self.id_to_children(tile_id)
+        self.children_id: List[str] = self.id_to_children(tile_id)
         self.resolution: int = self.id_get_resolution(tile_id)
 
     def __str__(self) -> str:
