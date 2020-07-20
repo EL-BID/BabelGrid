@@ -4,4 +4,4 @@ __author__ = """Joao Carabetta"""
 __email__ = "joao.carabetta@gmail.com"
 __version__ = "0.1.0"
 
-from babelgrid.src import Babel
+from babelgrid.babelgrid import *

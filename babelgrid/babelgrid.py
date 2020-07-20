@@ -7,9 +7,16 @@ from h3 import h3
 import shapely
 from shapely import geometry, wkt
 
-from babelgrid.src import quadtree, s2
+from babelgrid import quadtree, s2
 
-VALID_GRIDS = ["s2", "h3", "quadtree", "bing"]
+VALID_GRIDS = ["s2", "h3", "bing"]  #'quadtree
+
+RESOLUTION_RANGE = {
+    "h3": range(0, 16),
+    "s2": range(0, 31),
+    "bing": range(1, 24),
+    "quadtree": range(1, 24),
+}
 
 
 class Polygon:
@@ -85,6 +92,9 @@ class Babel:
     def available_grids() -> List:
         return VALID_GRIDS
 
+    def grid_range(self) -> range:
+        return RESOLUTION_RANGE[self.grid_type]
+
     def _validate_grid(self, grid_type: str):
 
         if grid_type.lower() not in VALID_GRIDS:
@@ -96,9 +106,53 @@ class Babel:
         else:
             return grid_type.lower()
 
-    def geo_to_id(self, lat: float, lon: float, resolution: int) -> str:
-        """Map coordinate pair (lat, lon) to tile id.
+    def _best_resolution(self, lat: float, area_km: float) -> int:
+        """Approximate best resolution given area in km squared.
 
+        TODO: This is not a very efficient method.
+
+        Parameters
+        ----------
+        lat : float
+        area_km : float
+
+        Returns
+        -------
+        int
+            Best resolution
+        """
+
+        return min(
+            zip(
+                range(1, 15),
+                [
+                    abs(self.geo_to_tile(lat, 0, resolution).area_km - area_km)
+                    for resolution in range(1, 15)
+                ],
+            ),
+            key=lambda t: t[1],
+        )[0]
+
+    def geo_to_tile(
+        self,
+        lat: float,
+        lon: float,
+        resolution: Union[int, None] = None,
+        area_km: Union[float, None] = None,
+    ) -> Tile:
+        """Map coordinate pair (lat, lon) and resolution to a Tile object.
+
+        The Tile object has nice properties. Let's say that `tile` is an
+        object from the Tile class.
+
+        ```
+        print(tile) --> Tile: grid_type "s2", resolution 14, key 94d28d8b
+        tile.geometry.shapely --> to access the shapely object
+        tile.geometry.wkt     --> to access the wkt string
+        tile.geometry.geojson --> to access the geojson object
+        tile.parent           --> to access the tile parent id
+        tile.parent           --> to access the tile children id
+        ```
         Parameters
         ----------
         lat : float
@@ -112,20 +166,28 @@ class Babel:
             Tile id
         """
 
+        if (resolution is None) and (area_km is not None):
+            resolution = self._best_resolution(lat, area_km)
+
+        elif (resolution is None) and (area_km is None):
+            raise Exception("Either resolution or area_km has to have a parameter")
+
         if self.grid_type == "s2":
 
-            return s2.geo_to_s2(lat, lon, resolution)
+            tile_id = s2.geo_to_s2(lat, lon, resolution)
 
         elif self.grid_type == "h3":
 
-            return h3.geo_to_h3(lat, lon, resolution)
+            tile_id = h3.geo_to_h3(lat, lon, resolution)
 
         elif self.grid_type in ("bing", "quadtree"):
 
-            return quadtree.geo_to_tile(lat, lon, resolution)
+            tile_id = quadtree.geo_to_tile(lat, lon, resolution)
 
-    def id_to_geo_boundary(self, tile_id: str) -> Tile:
-        """Maps tile id to geographic boundary Tile object.
+        return self.id_to_tile(tile_id)
+
+    def id_to_tile(self, tile_id: str) -> Tile:
+        """Maps tile id to a Tile object.
         
         The Tile object has nice properties. Let's say that `tile` is an
         object from the Tile class.
@@ -149,11 +211,11 @@ class Babel:
 
         if self.grid_type == "s2":
 
-            return Tile(s2.s2_to_geo_boundary(tile_id), tile_id, self.grid_type)
+            return Tile(s2.s2_to_geo_boundary(tile_id, True), tile_id, self.grid_type)
 
         elif self.grid_type == "h3":
 
-            return Tile(h3.h3_to_geo_boundary(tile_id), tile_id, self.grid_type)
+            return Tile(h3.h3_to_geo_boundary(tile_id, True), tile_id, self.grid_type)
 
         elif self.grid_type in ("bing", "quadtree"):
 
@@ -225,80 +287,6 @@ class Babel:
                 for tile_id in quadtree.polyfill(geometry.shapely, resolution)
             ]
 
-    def id_to_parent(self, tile_id: str) -> str:
-        """Maps tile id to parent tile id.
-
-        Parameters
-        ----------
-        tile_id : str
-
-        Returns
-        -------
-        str
-        """
-
-        if self.grid_type == "s2":
-
-            return s2.s2_to_parent(tile_id)
-
-        elif self.grid_type == "h3":
-
-            return h3.h3_to_parent(tile_id)
-
-        elif self.grid_type in ("bing", "quadtree"):
-
-            return quadtree.tile_to_parent(tile_id)
-
-    def id_to_children(self, tile_id: str) -> List[str]:
-        """Maps tile id to children tiles ids
-
-        Parameters
-        ----------
-        tile_id : str
-
-        Returns
-        -------
-        List[str]
-            List of children tile ids
-        """
-
-        if self.grid_type == "s2":
-
-            return s2.s2_to_children(tile_id)
-
-        elif self.grid_type == "h3":
-
-            return h3.h3_to_children(tile_id)
-
-        elif self.grid_type in ("bing", "quadtree"):
-
-            return quadtree.tile_to_children(tile_id)
-
-    def id_get_resolution(self, tile_id: str) -> int:
-        """Maps tile id to resolution/zoom/size
-
-        Parameters
-        ----------
-        tile_id : str
-
-        Returns
-        -------
-        int
-            Resolution/zoom/size
-        """
-
-        if self.grid_type == "s2":
-
-            return s2.s2_get_resolution(tile_id)
-
-        elif self.grid_type == "h3":
-
-            return h3.h3_get_resolution(tile_id)
-
-        elif self.grid_type in ("bing", "quadtree"):
-
-            return quadtree.tile_get_resolution(tile_id)
-
 
 class Tile(Babel):
     def __init__(
@@ -312,9 +300,6 @@ class Tile(Babel):
         self.centroid: Tuple = (self.geometry.shapely.centroid.x, self.geometry.shapely.centroid.y)
         self.tile_id: str = tile_id
         self.grid_type: str = grid_type
-        self.parent_id: str = self.id_to_parent(tile_id)
-        self.children_id: List[str] = self.id_to_children(tile_id)
-        self.resolution: int = self.id_get_resolution(tile_id)
 
     def __str__(self) -> str:
 
@@ -329,13 +314,105 @@ class Tile(Babel):
         return {
             "grid_type": self.grid_type,
             "tile_id": self.tile_id,
-            "parent_id": self.parent_id,
-            "children_id": self.children_id,
+            "resolution": self.resolution,
+            "parent_id": self.to_parent().tile_id,
+            "children_id": [cid.tile_id for cid in self.to_children()],
             "geojson": self.geometry.geojson,
             "wkt": self.geometry.wkt,
             "shapely": self.geometry.shapely,
             "centroid": self.centroid,
         }
+
+    def to_parent(self) -> Tile:
+        """Maps current tile to parent Tile object.
+
+        Returns
+        -------
+        Tile
+        """
+
+        if self.grid_type == "s2":
+
+            parent_id = s2.s2_to_parent(self.tile_id)
+
+        elif self.grid_type == "h3":
+
+            parent_id = h3.h3_to_parent(self.tile_id)
+
+        elif self.grid_type in ("bing", "quadtree"):
+
+            parent_id = quadtree.tile_to_parent(self.tile_id)
+
+        return self.id_to_tile(parent_id)
+
+    def to_children(self) -> List[Tile]:
+        """Maps current tile to children Tile objects
+
+        Returns
+        -------
+        List[Tile]
+            List of children Tile objects
+        """
+
+        if self.grid_type == "s2":
+
+            children_ids = s2.s2_to_children(self.tile_id)
+
+        elif self.grid_type == "h3":
+
+            children_ids = h3.h3_to_children(self.tile_id)
+
+        elif self.grid_type in ("bing", "quadtree"):
+
+            children_ids = quadtree.tile_to_children(self.tile_id)
+
+        return [self.id_to_tile(cid) for cid in children_ids]
+
+    @property
+    def resolution(self) -> int:
+        """Maps tile id to resolution/zoom/size
+
+        Parameters
+        ----------
+        tile_id : str
+
+        Returns
+        -------
+        int
+            Resolution/zoom/size
+        """
+
+        if self.grid_type == "s2":
+
+            return s2.s2_get_resolution(self.tile_id)
+
+        elif self.grid_type == "h3":
+
+            return h3.h3_get_resolution(self.tile_id)
+
+        elif self.grid_type in ("bing", "quadtree"):
+
+            return quadtree.tile_get_resolution(self.tile_id)
+
+    @property
+    def area_km(self) -> float:
+        """Tile area in km squared
+        """
+
+        import pyproj
+        from functools import partial
+        from shapely.ops import transform
+
+        return round(
+            transform(
+                partial(
+                    pyproj.transform, pyproj.Proj(init="epsg:4326"), pyproj.Proj(init="epsg:3857")
+                ),
+                self.geometry.shapely,
+            ).area
+            / 10 ** 6,
+            10,
+        )
 
 
 if __name__ == "__main__":
