@@ -48,6 +48,20 @@ class Polygon:
         self.geojson: dict = self.from_shapely_to_geojson(polygon)
         self.wkt: str = self.from_shapely_to_wkt(polygon)
 
+    @property
+    def avg_latitude(self):
+
+        l = [lat for lon, lat in self.geojson["coordinates"][0]]
+
+        return sum(l) / len(l)
+
+    @property
+    def avg_lon(self):
+
+        l = [lon for lon, lat in self.geojson["coordinates"][0]]
+
+        return sum(l) / len(l)
+
     @staticmethod
     def from_shapely_to_geojson(polygon: shapely.geometry.polygon.Polygon) -> dict:
 
@@ -124,10 +138,10 @@ class Babel:
 
         return min(
             zip(
-                range(1, 15),
+                self.grid_range(),
                 [
                     abs(self.geo_to_tile(lat, 0, resolution).area_km - area_km)
-                    for resolution in range(1, 15)
+                    for resolution in self.grid_range()
                 ],
             ),
             key=lambda t: t[1],
@@ -222,7 +236,10 @@ class Babel:
             return Tile(quadtree.tile_to_geo_boundary(tile_id), tile_id, self.grid_type)
 
     def polyfill(
-        self, geometry: Union[str, dict, shapely.geometry.polygon.Polygon], resolution: int,
+        self,
+        geometry: Union[str, dict, shapely.geometry.polygon.Polygon],
+        resolution: Union[int, None] = None,
+        area_km: Union[float, None] = None,
     ) -> List[Tile]:
         """Fill an arbitrary geometry with tiles of a given resolution.
 
@@ -265,6 +282,12 @@ class Babel:
         """
 
         geometry = Polygon(geometry)
+
+        if (resolution is None) and (area_km is not None):
+            resolution = self._best_resolution(geometry.avg_latitude, area_km)
+
+        elif (resolution is None) and (area_km is None):
+            raise Exception("Either resolution or area_km has to have a parameter")
 
         if self.grid_type == "s2":
 
