@@ -6,6 +6,9 @@ from typing import List, Tuple, Union, Any
 from h3 import h3
 import shapely
 from shapely import geometry, wkt
+import pyproj
+from functools import partial
+from shapely.ops import transform
 
 from babelgrid import quadtree, s2
 
@@ -437,16 +440,12 @@ class Tile(Babel):
         """Tile area in km squared
         """
 
-        import pyproj
-        from functools import partial
-        from shapely.ops import transform
-
         return round(
             transform(
                 partial(
                     pyproj.transform,
-                    pyproj.Proj(init="epsg:4326"),
-                    pyproj.Proj(init="epsg:3857"),
+                    pyproj.Proj("epsg:4326"),
+                    pyproj.Proj("epsg:3857"),
                 ),
                 self.geometry.shapely,
             ).area
