@@ -158,7 +158,8 @@ has some handy features that speed-up the analysis process.
 | Resolution Range       | 0 - 15                                 | 0 - 30                                               | 1 - 23 (infinite)                                                                                 |
 | API Reference          | [h3-py](https://github.com/uber/h3-py) | [s2sphere](https://github.com/sidewalklabs/s2sphere) | [pygeotile](https://github.com/geometalab/pyGeoTile)                                              |
 | Original Documentation | [H3](https://h3geo.org/)               | [S2 Geometry](https://s2geometry.io/)                | [Bing Maps Tile System](https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system) |
-Kudos to all developer of H3, S2 and Bing/QuadTree systems.
+
+:star: Kudos to all developer of H3, S2 and Bing/QuadTree systems.
 
 ### Resolution Reference Table and Plot
 
