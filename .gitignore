@@ -101,4 +101,4 @@ python_boilerplate/
 .editorconfig
 .github
 .ipynb_checkpoints
-notebooks
+.mypy_cache

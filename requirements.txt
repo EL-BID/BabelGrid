@@ -1,2 +1,4 @@
 s2sphere
 shapely
+h3
+pygeotile

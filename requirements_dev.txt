@@ -16,3 +16,4 @@ pytest
 jupyterlab
 ipykernel
 black
+folium
