@@ -10,7 +10,7 @@ license = "AM-331-A3 Licencia de Software"
 name = "babelgrid"
 readme = "README.md"
 repository = "https://github.com/EL-BID/BabelGrid"
-version = "0.1.2"
+version = "0.1.3"
 
 [tool.poetry.dependencies]
 h3 = '3.6.3'

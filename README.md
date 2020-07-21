@@ -215,3 +215,17 @@ shows the mean distortion given all resolutions and the error bar is the standar
 
 ## Developing
 
+Start envorinment with
+
+`make create-env`
+
+Update envorinment with
+
+`make update-env`
+
+Publish to PyPi
+
+```bash
+poetry version [patch, minor, major]
+make publish
+```
