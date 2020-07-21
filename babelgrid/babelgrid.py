@@ -21,7 +21,10 @@ RESOLUTION_RANGE = {
 
 class Polygon:
     def __init__(
-        self, polygon: Union[str, dict, shapely.geometry.polygon.Polygon, List[Any], Tuple[Any]]
+        self,
+        polygon: Union[
+            str, dict, shapely.geometry.polygon.Polygon, List[Any], Tuple[Any]
+        ],
     ) -> None:
 
         if isinstance(polygon, shapely.geometry.polygon.Polygon):
@@ -147,6 +150,21 @@ class Babel:
             key=lambda t: t[1],
         )[0]
 
+    def _checks_resolution_option(
+        self, resolution: Union[int, None], area_km: Union[float, None], latitude: float
+    ) -> int:
+
+        if (resolution is None) and (area_km is not None):
+            resolution = self._best_resolution(latitude, area_km)
+
+        elif (resolution is None) and (area_km is None):
+            raise Exception("Either resolution or area_km has to have a parameter")
+
+        elif (resolution is not None) and (area_km is not None):
+            raise Exception("You cannot give a number to both resolution and area_km")
+
+        return resolution
+
     def geo_to_tile(
         self,
         lat: float,
@@ -180,11 +198,7 @@ class Babel:
             Tile id
         """
 
-        if (resolution is None) and (area_km is not None):
-            resolution = self._best_resolution(lat, area_km)
-
-        elif (resolution is None) and (area_km is None):
-            raise Exception("Either resolution or area_km has to have a parameter")
+        resolution = self._checks_resolution_option(resolution, area_km, lat)
 
         if self.grid_type == "s2":
 
@@ -283,11 +297,9 @@ class Babel:
 
         geometry = Polygon(geometry)
 
-        if (resolution is None) and (area_km is not None):
-            resolution = self._best_resolution(geometry.avg_latitude, area_km)
-
-        elif (resolution is None) and (area_km is None):
-            raise Exception("Either resolution or area_km has to have a parameter")
+        resolution = self._checks_resolution_option(
+            resolution, area_km, geometry.avg_latitude
+        )
 
         if self.grid_type == "s2":
 
@@ -320,7 +332,10 @@ class Tile(Babel):
     ) -> None:
 
         self.geometry: Polygon = Polygon(polygon)
-        self.centroid: Tuple = (self.geometry.shapely.centroid.x, self.geometry.shapely.centroid.y)
+        self.centroid: Tuple = (
+            self.geometry.shapely.centroid.x,
+            self.geometry.shapely.centroid.y,
+        )
         self.tile_id: str = tile_id
         self.grid_type: str = grid_type
 
@@ -429,7 +444,9 @@ class Tile(Babel):
         return round(
             transform(
                 partial(
-                    pyproj.transform, pyproj.Proj(init="epsg:4326"), pyproj.Proj(init="epsg:3857")
+                    pyproj.transform,
+                    pyproj.Proj(init="epsg:4326"),
+                    pyproj.Proj(init="epsg:3857"),
                 ),
                 self.geometry.shapely,
             ).area

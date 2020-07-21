@@ -64,4 +64,3 @@ def test_polyfill():
     #     s2.polyfill(data_test["boundary"], 10, True, False)
     #     == data_test["boundary_10_true_false"]
     # )
-

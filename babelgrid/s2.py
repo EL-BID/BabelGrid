@@ -1,6 +1,5 @@
 from s2sphere import RegionCoverer, LatLng, LatLngRect, CellId, Cell
-import json
-from shapely.geometry import Polygon, Point
+from shapely.geometry import Polygon
 
 
 def _geo_json_to_extremes(geo_json):
