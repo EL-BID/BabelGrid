@@ -10,11 +10,12 @@ license = "AM-331-A3 Licencia de Software"
 name = "babelgrid"
 readme = "README.md"
 repository = "https://github.com/EL-BID/BabelGrid"
-version = "0.1.0"
+version = "0.1.2"
 
 [tool.poetry.dependencies]
 h3 = '3.6.3'
 pygeotile = "*"
+pyproj = '2.6.1'
 python = "^3.7"
 s2sphere = '0.2.5'
 shapely = '1.7.0'
@@ -25,10 +26,6 @@ pygeotile = "*"
 python = "^3.7"
 s2sphere = '0.2.5'
 shapely = '1.7.0'
-
-[build-system]
-build-backend = "poetry.masonry.api"
-requires = ["poetry>=0.12"]
 
 [tool.black]
 # Use the more relaxed max line length permitted in PEP8.
@@ -46,3 +43,6 @@ exclude = '''
 '''
 line-length = 88
 target-version = ["py36", "py37", "py38"]
+[build-system]
+build-backend = "poetry.masonry.api"
+requires = ["poetry>=0.12"]
