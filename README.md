@@ -15,7 +15,7 @@ Install with
 pip install babelgrid
 ```
 
-:point_right: Get a h3 tile with an area of 1km2 in São Paulo, Brasil.
+- Get a h3 tile with an area of 1km2 in São Paulo, Brasil.
 ```python
 >>> from babelgrid import Babel
 
@@ -24,7 +24,7 @@ pip install babelgrid
 Tile: grid_type "h3", resolution 8, tile_id 88a8a2b66dfffff
 ```
 
-:point_right: Access the geojson, wkt and shapely descriptions of the tile:
+- Access the geojson, wkt and shapely descriptions of the tile:
 ```python
 >>> tile.geometry.geojson
 {'type': 'Polygon',
@@ -41,13 +41,13 @@ Tile: grid_type "h3", resolution 8, tile_id 88a8a2b66dfffff
 ```
 ![][shapely]
 
-:point_right:     Fill a geometry with s2 tiles of resolution 10
+-  Fill a geometry with s2 tiles of resolution 10
 ```python
 >>> tiles = Babel('s2').polyfill(geometry, resolution=10)
 >>> tiles
 [Tile: grid_type "s2", resolution 10, tile_id 94d28d,... ,Tile: grid_type "s2", resolution 10, tile_id 94d28f]
 ```
-:point_right: Load a geopandas dataframe with the selected tiles
+- Load a geopandas dataframe with the selected tiles
 ```python
 >>> import geopandas as gpd
 >>> gpd.GeoDataFrame([t.to_dict() for t in tiles], geometry='shapely')

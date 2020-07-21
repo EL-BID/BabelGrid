@@ -2,6 +2,9 @@
 
 REPO=$(shell basename $(CURDIR))
 
+publish:
+	poetry publish --build
+
 create-env:
 	python3 -m venv .$(REPO);
 	source .$(REPO)/bin/activate; \
