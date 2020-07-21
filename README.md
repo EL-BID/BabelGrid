@@ -116,10 +116,94 @@ The image below shows `polyfill` being applied for the same geometry for differe
 
 ![][polyfill]
 
+### The Tile Object
+
+The Tile Object is a central piece of the package. This is the object that is returned by most of the methods implemented. It is good because it 
+has some handy features that speed-up the analysis process.
+
+- Easy access to wkt, geojson and shapely geometries
+
+```python
+>>> tile.geometry.wkt
+>>> tile.geometry.geojson
+>>> tile.geometry.shapely
+```
+
+- Child and parent transformation
+
+```python
+>>> tile.to_parent()
+>>> tile.to_children()
+```
+
+- Area in km2 already calculated
+
+```python
+>>> tile.area_km
+```
+
+- To dictonary export of all properties
+
+```python
+>>> tile.to_dict()
+```
+
 ## Grid Systems
 
 
+
+|                        | H3                                     | S2                                                   | BING/QuadTree                                                                                     |
+|------------------------|----------------------------------------|------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| Tile Shape             | Hexagonal                              | Square                                               | Square                                                                                            |
+| Resolution Range       | 0 - 15                                 | 0 - 30                                               | 1 - 23 (infinite)                                                                                 |
+| API Reference          | [h3-py](https://github.com/uber/h3-py) | [s2sphere](https://github.com/sidewalklabs/s2sphere) | [pygeotile](https://github.com/geometalab/pyGeoTile)                                              |
+| Original Documentation | [H3](https://h3geo.org/)               | [S2 Geometry](https://s2geometry.io/)                | [Bing Maps Tile System](https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system) |
+Kudos to all developer of H3, S2 and Bing/QuadTree systems.
+
+### Resolution Reference Table and Plot
+
+
+Lookup table with grid resolutions at equator by area in km2. 
+Note that the area is written in scientific notation (10^x) and x 
+is the index of the table.
+
+| Area (10^x km2) | H3    | S2    | BING/QuadTree   |
+|-----------:|:------|:------|:----------------|
+|          9 | -     | -     | 1               |
+|          8 | -     | 0     | 2               |
+|          7 | -     | 1,2   | 3,4             |
+|          6 | 0,1   | 3,4   | 5,6             |
+|          5 | 2     | 5     | 7               |
+|          4 | 3     | 6,7   | 8,9             |
+|          3 | 4     | 8     | 10,11           |
+|          2 | 5     | 9,10  | 12              |
+|          1 | 6,7   | 11,12 | 13,14           |
+|          0 | 8     | 13    | 15,16           |
+|         -1 | 9     | 14,15 | 17              |
+|         -2 | 10    | 16,17 | 18,19           |
+|         -3 | 11    | 18    | 20,21           |
+|         -4 | 12,13 | 19,20 | 22              |
+|         -5 | 14    | 21,22 | 23              |
+|         -6 | 15    | 23    | -               |
+|         -7 | -     | 24,25 | -               |
+|         -8 | -     | 26,27 | -               |
+|         -9 | -     | 28    | -               |
+|        -10 | -     | 29,30 | -               |
+
+
 ![][area-res]
+
+### Tile Area Distortion by Latitude
+
+Depending on how the tile system is built, the area of the tile varies given the latitude. 
+For inter-region comparissons, this behaviour can affect the analysis. 
+
+The figure below shows the tile area distortion by grid system. The distortion is defined as
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=D&space;=&space;A_l&space;/&space;A_e" target="_blank"><img src="https://latex.codecogs.com/gif.latex?D&space;=&space;A_l&space;/&space;A_e" title="D = A_l / A_e" /></a>
+
+where <a href="https://www.codecogs.com/eqnedit.php?latex=\inline&space;A" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\inline&space;A" title="A" /></a> is the tile area and <a href="https://www.codecogs.com/eqnedit.php?latex=\inline&space;l" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\inline&space;l" title="l" /></a> the area given a latitude and <a href="https://www.codecogs.com/eqnedit.php?latex=\inline&space;e" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\inline&space;e" title="e" /></a> the equator area. The figure
+shows the mean distortion given all resolutions and the error bar is the standard deviation.
 
 ![][area-distortion]
 
@@ -127,3 +211,6 @@ The image below shows `polyfill` being applied for the same geometry for differe
 [polyfill]: https://github.com/EL-BID/BabelGrid/blob/master/imgs/polyfill.png
 [area-res]: https://github.com/EL-BID/BabelGrid/blob/master/imgs/gridtype-area-res.png?raw=true
 [area-distortion]: https://github.com/EL-BID/BabelGrid/blob/master/imgs/gridtype-distortion.png
+
+## Developing
+
