@@ -1,5 +1,7 @@
-# BabelGrid
+[![Downloads](https://pepy.tech/badge/babelgrid)](https://pepy.tech/project/babelgrid)
+[![Analytics](https://gabeacon.irvinlim.com/UA-4677001-16/BabelGrid/readme?useReferer)](https://github.com/EL-BID/BabelGrid)
 
+# BabelGrid
 **BabelGrid is a common python API to work with different established grid systems.**
 
 Currently, it supports [H3](https://h3geo.org/), [S2](https://s2geometry.io/) and [Bing](https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system) grid systems. 
