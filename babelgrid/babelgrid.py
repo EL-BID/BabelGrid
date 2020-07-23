@@ -49,6 +49,9 @@ class Polygon:
 
             polygon = self.from_geojson_to_shapely(polygon)
 
+        else:
+            raise Exception(f"{polygon} is not an accepted polygon type")
+
         self.build_object(polygon)
 
     def build_object(self, polygon: shapely.geometry.polygon.Polygon) -> None:
