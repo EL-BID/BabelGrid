@@ -26,11 +26,15 @@ def _get_contained_keys(geometry, initial_key, resolution):
                     func(child_key, True)
         else:
             area_ratio = _area_ratio(_key_to_shapely(key), geometry)
+            if area_ratio == 0:
 
-            if area_ratio >= 1:
+                if int(key) < 3:  # loops through root tiles
+
+                    func(str(int(key) + 1), False)
+                else:
+                    return
+            elif area_ratio >= 1:
                 func(key, True)
-            elif area_ratio == 0:
-                return
             elif len(key) == resolution:
                 contained_keys.append(key)
             else:
@@ -44,7 +48,7 @@ def _get_contained_keys(geometry, initial_key, resolution):
 
 def polyfill(geometry, resolution):
 
-    return _get_contained_keys(geometry, "1", resolution)
+    return _get_contained_keys(geometry, "0", resolution)
 
 
 def tile_to_geo_boundary(key):
