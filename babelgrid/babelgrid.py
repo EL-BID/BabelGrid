@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 from __future__ import annotations
 
-from typing import List, Tuple, Union, Any
+from typing import List, Tuple, Union, Any, Optional
 from collections import namedtuple
 
 from h3 import h3
 import shapely
-from shapely import geometry, wkt
+from shapely import wkt
 import pyproj
 from functools import partial
 from shapely.ops import transform
@@ -22,15 +22,42 @@ RESOLUTION_RANGE = {
     "quadtree": range(1, 24),
 }
 
+ShapelyPolys = Union[
+    shapely.geometry.polygon.Polygon, shapely.geometry.multipolygon.MultiPolygon,
+]
+
 Point = namedtuple("Point", "latitude longitude")
 
 
 class Conversors:
-    def any_to_shapely(self, polygon):
+    # def __init__(self):
+    #     pass
+
+    def any_to_shapely(
+        self, polygon: Union[str, dict, ShapelyPolys, List[Any], Tuple[Any],],
+    ) -> ShapelyPolys:
+        """Convert WKT, geojson to shapely objects.
+
+        Parameters
+        ----------
+        polygon : Union[str, dict, ShapelyPolys, List[Any], Tuple[Any],]
+
+        Returns
+        -------
+        ShapelyPolys
+
+        Raises
+        ------
+        Exception
+            If it is not an accepted type.
+        """
 
         if isinstance(
             polygon,
-            (shapely.geometry.polygon.Polygon, shapely.geometry.polygon.MultiPolygon,),
+            (
+                shapely.geometry.polygon.Polygon,
+                shapely.geometry.multipolygon.MultiPolygon,
+            ),
         ):
 
             pass
@@ -53,31 +80,32 @@ class Conversors:
         return polygon
 
     @staticmethod
-    def from_shapely_to_geojson(polygon: shapely.geometry.polygon.Polygon) -> dict:
+    def from_shapely_to_geojson(polygon: ShapelyPolys) -> dict:
 
-        return geometry.mapping(polygon)
+        return shapely.geometry.mapping(polygon)
 
     @staticmethod
-    def from_shapely_to_wkt(polygon: shapely.geometry.polygon.Polygon) -> str:
+    def from_shapely_to_wkt(polygon: ShapelyPolys) -> str:
 
         return wkt.dumps(polygon)
 
     @staticmethod
-    def from_wkt_to_shapely(polygon: str) -> shapely.geometry.polygon.Polygon:
+    def from_wkt_to_shapely(polygon: str) -> ShapelyPolys:
 
         return wkt.loads(polygon)
 
     @staticmethod
-    def from_geojson_to_shapely(polygon: dict) -> shapely.geometry.polygon.Polygon:
+    def from_geojson_to_shapely(polygon: dict) -> ShapelyPolys:
 
-        return geometry.Polygon(polygon["coordinates"][0])
+        return shapely.geometry.shape(polygon)
 
     @staticmethod
     def from_list_to_shapely(
         polygon: Union[List[Any], Tuple[Any, ...]]
     ) -> shapely.geometry.polygon.Polygon:
+        """TODO: Add multipolygon support"""
 
-        return geometry.Polygon(polygon)
+        return shapely.geometry.Polygon(polygon)
 
 
 class Polygon(Conversors):
@@ -165,7 +193,7 @@ class Babel:
     ) -> int:
 
         if (resolution is None) and (area_km is not None):
-            resolution = self._best_resolution(latitude, area_km)
+            return self._best_resolution(latitude, area_km)
 
         elif (resolution is None) and (area_km is None):
             raise Exception("Either resolution or area_km has to have a parameter")
@@ -173,7 +201,8 @@ class Babel:
         elif (resolution is not None) and (area_km is not None):
             raise Exception("You cannot give a number to both resolution and area_km")
 
-        return resolution
+        elif resolution is not None:
+            return resolution
 
     def geo_to_tile(
         self,
@@ -261,15 +290,22 @@ class Babel:
 
     def polyfill(
         self,
-        geometry: Union[str, dict, shapely.geometry.polygon.Polygon],
+        geometry: Union[
+            str,
+            dict,
+            shapely.geometry.polygon.Polygon,
+            shapely.geometry.multipolygon.MultiPolygon,
+        ],
         resolution: Union[int, None] = None,
         area_km: Union[float, None] = None,
     ) -> List[Tile]:
-        """Fill an arbitrary geometry with tiles of a given resolution.
+        """Fill an arbitrary geometry with tiles of a given resolution or tile area.
+
+        It accepts Polygons or MultiPolygons.
 
         It returns a list of Tile objects.
 
-        An Tile object has nice properties. Let's say that `tile` is an
+        A Tile object has nice properties. Let's say that `tile` is an
         object from the Tile class.
 
         ```
@@ -281,7 +317,13 @@ class Babel:
         tile.parent           --> to access the tile children id
         ```
 
-        You can easily plot your result with folium with few lines:
+        You can easily turn it into a geopandas GeoDataFrame
+
+        ```
+        gpd.GeoDataFrame([t.to_dict() for t in Babel('h3').polyfill(geometry, resolution=2)])
+        ```
+
+        Or plot your result with folium with few lines:
 
         ```
         import folium
@@ -294,8 +336,8 @@ class Babel:
 
         Parameters
         ----------
-        geometry : Union[str, dict, shapely.geometry.polygon.Polygon]
-            Arbitrary geometry. It accepts geojson and wkt, but shapely Polygons
+        geometry : Union[str, dict, shapely.geometry.polygon.Polygon, shapely.geometry.multipolygon.MultiPolygon]
+            Arbitrary geometry. It accepts geojson and wkt, but shapely Objects 
             are prefered.
         resolution : int
             Grid system resolution/zoom/size
@@ -305,12 +347,35 @@ class Babel:
         List[Tile]
         """
 
-        geometry = Polygon(geometry)
+        flatten = lambda l: [item for sublist in l for item in sublist]
+
+        raw_geometry = Conversors().any_to_shapely(geometry)
+
+        if isinstance(raw_geometry, shapely.geometry.multipolygon.MultiPolygon):
+            geometries = [Polygon(g) for g in raw_geometry.geoms]
+        elif isinstance(raw_geometry, shapely.geometry.polygon.Polygon):
+            geometries = [Polygon(raw_geometry)]
 
         resolution = self._checks_resolution_option(
-            resolution, area_km, geometry.centroid.latitude
+            resolution, area_km, raw_geometry.centroid.y
         )
 
+        return flatten([self._polyfill(geom, resolution) for geom in geometries])
+
+    def _polyfill(
+        self, geometry: shapely.geometry.polygon.Polygon, resolution: int
+    ) -> List[Tile]:
+        """Internal polyfill. Calls grids polyfills accordinly.
+
+        Parameters
+        ----------
+        geometry : shapely.geometry.polygon.Polygon
+        resolution : int
+
+        Returns
+        -------
+        List[Tile]
+        """
         if self.grid_type == "s2":
 
             return [
@@ -321,8 +386,8 @@ class Babel:
         elif self.grid_type == "h3":
 
             return [
-                Tile(h3.h3_to_geo_boundary(tile_id), tile_id, "h3")
-                for tile_id in h3.polyfill(geometry.geojson, resolution)
+                Tile(h3.h3_to_geo_boundary(tile_id, True), tile_id, "h3")
+                for tile_id in h3.polyfill_geojson(geometry.geojson, resolution)
             ]
 
         elif self.grid_type in ("bing", "quadtree"):
@@ -364,7 +429,7 @@ class Tile(Babel):
             "geojson": self.geometry.geojson,
             "wkt": self.geometry.wkt,
             "shapely": self.geometry.shapely,
-            "centroid": self.centroid,
+            "centroid": self.geometry.centroid,
         }
 
     def to_parent(self) -> Tile:
