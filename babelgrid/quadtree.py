@@ -3,7 +3,7 @@ from shapely import wkt
 
 
 def _centroid_to_key(geometry, resolution):
-    return geo_to_tile(geometry.centroid.x, geometry.centroid.y, resolution)
+    return geo_to_tile(geometry.centroid.y, geometry.centroid.x, resolution)
 
 
 def _key_to_shapely(key):
