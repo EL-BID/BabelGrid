@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import List, Tuple, Union, Any
+from collections import namedtuple
 
 from h3 import h3
 import shapely
@@ -20,6 +21,8 @@ RESOLUTION_RANGE = {
     "bing": range(1, 24),
     "quadtree": range(1, 24),
 }
+
+Point = namedtuple("Point", "latitude longitude")
 
 
 class Polygon:
@@ -53,20 +56,9 @@ class Polygon:
         self.shapely: shapely.geometry.polygon.Polygon = polygon
         self.geojson: dict = self.from_shapely_to_geojson(polygon)
         self.wkt: str = self.from_shapely_to_wkt(polygon)
-
-    @property
-    def avg_latitude(self):
-
-        l = [lat for lon, lat in self.geojson["coordinates"][0]]
-
-        return sum(l) / len(l)
-
-    @property
-    def avg_lon(self):
-
-        l = [lon for lon, lat in self.geojson["coordinates"][0]]
-
-        return sum(l) / len(l)
+        self.centroid: Point = Point(
+            latitude=polygon.centroid.y, longitude=polygon.centroid.x
+        )
 
     @staticmethod
     def from_shapely_to_geojson(polygon: shapely.geometry.polygon.Polygon) -> dict:
@@ -301,7 +293,7 @@ class Babel:
         geometry = Polygon(geometry)
 
         resolution = self._checks_resolution_option(
-            resolution, area_km, geometry.avg_latitude
+            resolution, area_km, geometry.centroid.latitude
         )
 
         if self.grid_type == "s2":
@@ -335,10 +327,6 @@ class Tile(Babel):
     ) -> None:
 
         self.geometry: Polygon = Polygon(polygon)
-        self.centroid: Tuple = (
-            self.geometry.shapely.centroid.x,
-            self.geometry.shapely.centroid.y,
-        )
         self.tile_id: str = tile_id
         self.grid_type: str = grid_type
 
