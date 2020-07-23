@@ -2,18 +2,9 @@ from pygeotile.tile import Tile
 from shapely import wkt
 
 
-def _centroid_to_key(geometry, resolution):
-    return geo_to_tile(geometry.centroid.y, geometry.centroid.x, resolution)
-
-
 def _key_to_shapely(key):
 
     return wkt.loads(tile_to_geo_boundary(key))
-
-
-def _geometry_to_tile_shapely(geometry, resolution):
-
-    return _key_to_shapely(_centroid_to_key(geometry, resolution))
 
 
 def _area_ratio(a, b):
@@ -35,7 +26,7 @@ def _get_contained_keys(geometry, initial_key, resolution):
                     func(child_key, True)
         else:
             area_ratio = _area_ratio(_key_to_shapely(key), geometry)
-            print("\n", "area_ratio: ", area_ratio, "len(key): ", len(key))
+
             if area_ratio >= 1:
                 func(key, True)
             elif area_ratio == 0:
