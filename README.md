@@ -1,6 +1,9 @@
-# BabelGrid
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=EL-BID_BabelGrid&metric=alert_status)](https://sonarcloud.io/dashboard?id=EL-BID_BabelGrid)
+[![Downloads](https://pepy.tech/badge/babelgrid)](https://pepy.tech/project/babelgrid)
+[![Analytics](https://gabeacon.irvinlim.com/UA-4677001-16/BabelGrid/readme?useReferer)](https://github.com/EL-BID/BabelGrid)
 
 **BabelGrid is a common python API to work with different established geospatial indexing systems.**
+
 
 Currently, it supports [H3](https://h3geo.org/), [S2](https://s2geometry.io/) and [Bing](https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system) geospatial indexing systems. 
 BabelGrid does not have the intention to replace any of the existing APIs, but
@@ -246,3 +249,4 @@ make publish
 ## License
 
 This work is licensed under a Creative Commons IGO 3.0 - see the [LICENSE.md](LICENSE.md) file for details.
+
