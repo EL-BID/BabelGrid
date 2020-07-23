@@ -25,15 +25,13 @@ RESOLUTION_RANGE = {
 Point = namedtuple("Point", "latitude longitude")
 
 
-class Polygon:
-    def __init__(
-        self,
-        polygon: Union[
-            str, dict, shapely.geometry.polygon.Polygon, List[Any], Tuple[Any]
-        ],
-    ) -> None:
+class Conversors:
+    def any_to_shapely(self, polygon):
 
-        if isinstance(polygon, shapely.geometry.polygon.Polygon):
+        if isinstance(
+            polygon,
+            (shapely.geometry.polygon.Polygon, shapely.geometry.polygon.MultiPolygon,),
+        ):
 
             pass
 
@@ -52,16 +50,7 @@ class Polygon:
         else:
             raise Exception(f"{polygon} is not an accepted polygon type")
 
-        self.build_object(polygon)
-
-    def build_object(self, polygon: shapely.geometry.polygon.Polygon) -> None:
-
-        self.shapely: shapely.geometry.polygon.Polygon = polygon
-        self.geojson: dict = self.from_shapely_to_geojson(polygon)
-        self.wkt: str = self.from_shapely_to_wkt(polygon)
-        self.centroid: Point = Point(
-            latitude=polygon.centroid.y, longitude=polygon.centroid.x
-        )
+        return polygon
 
     @staticmethod
     def from_shapely_to_geojson(polygon: shapely.geometry.polygon.Polygon) -> dict:
@@ -89,6 +78,29 @@ class Polygon:
     ) -> shapely.geometry.polygon.Polygon:
 
         return geometry.Polygon(polygon)
+
+
+class Polygon(Conversors):
+    def __init__(
+        self,
+        polygon: Union[
+            str, dict, shapely.geometry.polygon.Polygon, List[Any], Tuple[Any]
+        ],
+    ) -> None:
+
+        polygon = self.any_to_shapely(polygon)
+
+        if not isinstance(polygon, shapely.geometry.polygon.Polygon):
+            raise Exception(
+                f"This is not a shapely.geometry.polygon.Polygon object: {polygon}"
+            )
+
+        self.shapely: shapely.geometry.polygon.Polygon = polygon
+        self.geojson: dict = self.from_shapely_to_geojson(polygon)
+        self.wkt: str = self.from_shapely_to_wkt(polygon)
+        self.centroid: Point = Point(
+            latitude=polygon.centroid.y, longitude=polygon.centroid.x
+        )
 
 
 class Babel:
