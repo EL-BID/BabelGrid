@@ -1,8 +1,8 @@
 # BabelGrid
 
-**BabelGrid is a common python API to work with different established grid systems.**
+**BabelGrid is a common python API to work with different established geospatial indexing systems.**
 
-Currently, it supports [H3](https://h3geo.org/), [S2](https://s2geometry.io/) and [Bing](https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system) grid systems. 
+Currently, it supports [H3](https://h3geo.org/), [S2](https://s2geometry.io/) and [Bing](https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system) geospatial indexing systems. 
 BabelGrid does not have the intention to replace any of the existing APIs, but
 to create a common framework that geo-folks can use to easily switch between grids. Also, 
 it generates methods around the tiles that ease the data analysis pipeline with seamlessly integration
@@ -95,8 +95,8 @@ Tile: grid_type "s2", resolution 10, tile_id 100fb1
 ```
 
 ### Polyfill
-One of the most common uses to grid systems is to fill up a geometry. This function receives
-a geometry and returns a list of Tile Objects.
+One of the most common uses to geospatial indexing systems is to fill up a geometry. This function receives
+a geometry that can be a polygon or multipolygons and returns a list of Tile Objects.
 
 ```python
 >>> tiles = Babel('s2').polyfill(geometry, resolution=10)
@@ -199,7 +199,7 @@ is the index of the table.
 Depending on how the tile system is built, the area of the tile varies given the latitude. 
 For inter-region comparissons, this behaviour can affect the analysis. 
 
-The figure below shows the tile area distortion by grid system. The distortion is defined as
+The figure below shows the tile area distortion by geospatial indexing systems. The distortion is defined as
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=D&space;=&space;A_l&space;/&space;A_e" target="_blank"><img src="https://latex.codecogs.com/gif.latex?D&space;=&space;A_l&space;/&space;A_e" title="D = A_l / A_e" /></a>
 
@@ -212,6 +212,15 @@ shows the mean distortion given all resolutions and the error bar is the standar
 [polyfill]: https://github.com/EL-BID/BabelGrid/blob/master/imgs/polyfill.png
 [area-res]: https://github.com/EL-BID/BabelGrid/blob/master/imgs/gridtype-area-res.png?raw=true
 [area-distortion]: https://github.com/EL-BID/BabelGrid/blob/master/imgs/gridtype-distortion.png
+
+## Contributing
+
+Any contribution is very welcomed. You can contribute in several ways:
+
+- Suggest new geospatial indexing systems
+- Raise issues with bugs and problems
+- Propose new features or behaviours
+- Contribute with code maintenence 
 
 ## Developing
 
@@ -229,3 +238,11 @@ Publish to PyPi
 poetry version [patch, minor, major]
 make publish
 ```
+
+## Authors
+
+- Joao Carabetta (joaom at iadb.org)
+
+## License
+
+This work is licensed under a Creative Commons IGO 3.0 - see the [LICENSE.md](LICENSE.md) file for details.
