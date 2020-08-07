@@ -1,4 +1,4 @@
-s2sphere
-shapely
-h3
-pygeotile
+s2sphere==0.2.5
+shapely==1.7.0
+h3==3.6.6
+pygeotile==1.0.6
