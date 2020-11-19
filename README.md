@@ -11,6 +11,8 @@ to create a common framework that geo-folks can use to easily switch between gri
 it generates methods around the tiles that ease the data analysis pipeline with seamlessly integration
 with well knonw libraries such as Shapely and GeoPandas.
 
+![](https://github.com/EL-BID/BabelGrid/blob/master/imgs/ezgif.com-gif-maker.gif)
+
 ## Start Using It
 
 Install with
