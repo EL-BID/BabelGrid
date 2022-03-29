@@ -251,5 +251,5 @@ make publish
 
 ## License
 
-This work is licensed under a Creative Commons IGO 3.0 - see the [LICENSE.md](LICENSE.md) file for details.
+This work is licensed under AM-331-A3 - see the [LICENSE.md](LICENSE.md) file for details.
 
