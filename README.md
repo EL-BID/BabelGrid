@@ -1,6 +1,7 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=EL-BID_BabelGrid&metric=alert_status)](https://sonarcloud.io/dashboard?id=EL-BID_BabelGrid)
 [![Downloads](https://pepy.tech/badge/babelgrid)](https://pepy.tech/project/babelgrid)
-[![Analytics](https://gabeacon.irvinlim.com/UA-4677001-16/BabelGrid/readme?useReferer)](https://github.com/EL-BID/BabelGrid)
+![analytics image (flat)](https://raw.githubusercontent.com/vitr/google-analytics-beacon/master/static/badge-flat.gif)
+![analytics](https://www.google-analytics.com/collect?v=1&cid=555&t=pageview&ec=repo&ea=open&dp=/BabelGrid/readme&dt=&tid=UA-4677001-16)
 
 **BabelGrid is a common python API to work with different established geospatial indexing systems.**
 
@@ -250,5 +251,5 @@ make publish
 
 ## License
 
-This work is licensed under a Creative Commons IGO 3.0 - see the [LICENSE.md](LICENSE.md) file for details.
+This work is licensed under AM-331-A3 - see the [LICENSE.md](LICENSE.md) file for details.
 
